@@ -1,4 +1,13 @@
-import { createSignal, createEffect, Show, Switch, Match, For } from "solid-js";
+import {
+  createSignal,
+  createEffect,
+  Show,
+  Switch,
+  Match,
+  For,
+  ErrorBoundary,
+} from "solid-js";
+import { Portal } from "solid-js/web";
 
 function Counter() {
   const [count, setCount] = createSignal(0);
@@ -74,6 +83,12 @@ const options = {
 function App() {
   const [selected, setSelected] = createSignal("red");
 
+  createEffect(() => {
+    console.log("Outer effect starts");
+    createEffect(() => console.log("Inner effect"));
+    console.log("Outer effect ends");
+  });
+
   return (
     <>
       <select
@@ -92,6 +107,19 @@ function App() {
           <GreenDiv />
         </Match>
       </Switch>
+      <Portal mount={document.querySelector("main") as Node}>
+        <div class="popup">Popup</div>
+      </Portal>
+      <ErrorBoundary
+        fallback={(error, reset) => (
+          <div>
+            <p>Something went wrong: {error.message}</p>
+            <button onClick={reset}>Try Again</button>
+          </div>
+        )}
+      >
+        <div>Error Prone</div>
+      </ErrorBoundary>
     </>
   );
 }
