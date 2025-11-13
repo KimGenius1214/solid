@@ -16,6 +16,8 @@ function Counter() {
     setDouble(count() * 2);
   });
 
+  const [theme, setTheme] = createSignal("light");
+
   return (
     <div class="flex flex-col items-center justify-center">
       <span>Count: {count()}</span>
@@ -25,7 +27,19 @@ function Counter() {
       </button>
       <div style="color: red;">This is a red div</div>
       <div style={{ color: "red" }}>This is a red div</div>
+      <div class={theme() === "light" ? "light-theme" : "dark-theme"}>
+        This div's theme is determined dynamically!
+      </div>
+      <ThemedButton theme={theme()} />
     </div>
+  );
+}
+
+function ThemedButton(props: { theme: string }) {
+  return (
+    <button class={props.theme}>
+      {props.theme === "light" ? "Light Button" : "Dark Button"}
+    </button>
   );
 }
 
