@@ -6,6 +6,8 @@ import {
   Match,
   For,
   ErrorBoundary,
+  onMount,
+  onCleanup,
 } from "solid-js";
 import { Portal } from "solid-js/web";
 
@@ -82,11 +84,26 @@ const options = {
 
 function App() {
   const [selected, setSelected] = createSignal("red");
+  const [count, setCount] = createSignal(0);
+
+  const timer = setInterval(() => {
+    setCount((prev) => prev + 1);
+  }, 1000);
+
+  onCleanup(() => {
+    clearInterval(timer);
+  });
 
   createEffect(() => {
     console.log("Outer effect starts");
     createEffect(() => console.log("Inner effect"));
     console.log("Outer effect ends");
+  });
+
+  onMount(async () => {
+    // will run only once, when the component is mounted
+    const fetchedData = await fetch("https://example.com/data");
+    console.log(fetchedData);
   });
 
   return (
