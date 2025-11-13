@@ -1,8 +1,14 @@
-import { createSignal } from "solid-js";
+import { createSignal, createEffect } from "solid-js";
 
 function Counter() {
   const [count, setCount] = createSignal(0);
   const increment = () => setCount((prev) => prev + 1);
+
+  console.log("Count:", count()); // ❌ not tracked - only runs once during initialization.
+
+  createEffect(() => {
+    console.log(count()); // ✅ will update whenever `count()` changes.
+  });
 
   return (
     <div>
