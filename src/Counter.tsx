@@ -1,4 +1,4 @@
-import { createSignal, createEffect } from "solid-js";
+import { createSignal, createEffect, Show, Switch, Match, For } from "solid-js";
 
 function Counter() {
   const [count, setCount] = createSignal(0);
@@ -16,7 +16,7 @@ function Counter() {
     setDouble(count() * 2);
   });
 
-  const [theme, setTheme] = createSignal("light");
+  const [theme, setTheme] = createSignal("dark");
 
   return (
     <div class="flex flex-col items-center justify-center">
@@ -31,6 +31,24 @@ function Counter() {
         This div's theme is determined dynamically!
       </div>
       <ThemedButton theme={theme()} />
+      <Show when={theme() === "light"} fallback={<div>Loading...</div>}>
+        <h1>Hi, I am {theme()}.</h1>
+      </Show>
+      <Show when={theme() === "light"}>
+        <div>Loading...</div>
+        <Show when={theme() === "dark"}>
+          <div>Dark</div>
+        </Show>
+      </Show>
+      <Switch>
+        <Match when={theme() === "light"}>
+          <p>Light</p>
+        </Match>
+        <Match when={theme() === "dark"}>
+          <p>Dark</p>
+        </Match>
+      </Switch>
+      <App />
     </div>
   );
 }
@@ -43,4 +61,39 @@ function ThemedButton(props: { theme: string }) {
   );
 }
 
-export default Counter;
+const RedDiv = () => <div style="color: red">Red</div>;
+const GreenDiv = () => <div style="color: green">Green</div>;
+const BlueDiv = () => <div style="color: blue">Blue</div>;
+
+const options = {
+  red: RedDiv,
+  green: GreenDiv,
+  blue: BlueDiv,
+};
+
+function App() {
+  const [selected, setSelected] = createSignal("red");
+
+  return (
+    <>
+      <select
+        value={selected()}
+        onInput={(e) => setSelected(e.currentTarget.value)}
+      >
+        <For each={Object.keys(options)}>
+          {(color) => <option value={color}>{color}</option>}
+        </For>
+      </select>
+      <Switch fallback={<BlueDiv />}>
+        <Match when={selected() === "red"}>
+          <RedDiv />
+        </Match>
+        <Match when={selected() === "green"}>
+          <GreenDiv />
+        </Match>
+      </Switch>
+    </>
+  );
+}
+
+export default App;
