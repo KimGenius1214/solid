@@ -8,12 +8,39 @@ import {
   ErrorBoundary,
   onMount,
   onCleanup,
+  createMemo,
+  useContext,
+  createContext,
+  type JSX,
 } from "solid-js";
 import { Portal } from "solid-js/web";
 
 function Counter() {
   const [count, setCount] = createSignal(0);
   const [double, setDouble] = createSignal(0);
+  const [message, setMessage] = createSignal("");
+
+  const badMemo = createMemo(() => {
+    if (count() > 10) {
+      setMessage("Count is too high!"); //  side effect
+    }
+    return count() % 2 === 0;
+  });
+  console.log(badMemo()); // true
+  const isEven = createMemo(() => count() % 2 === 0);
+
+  console.log(isEven()); // true
+
+  setCount(3);
+  console.log(isEven()); // false
+
+  const timer = setInterval(() => {
+    setCount((prev) => prev + 1);
+  }, 1000);
+
+  onCleanup(() => {
+    clearInterval(timer);
+  });
 
   const increment = () => setCount((prev) => prev + 1);
 
@@ -28,39 +55,54 @@ function Counter() {
   });
 
   const [theme, setTheme] = createSignal("dark");
+  const MyContext = createContext();
+
+  const Provider = (props: { children: JSX.Element }) => (
+    <MyContext.Provider value="new test">{props.children}</MyContext.Provider>
+  );
+
+  const Child = () => {
+    const value = useContext(MyContext);
+
+    return <span>{value as string}</span>;
+  };
 
   return (
-    <div class="flex flex-col items-center justify-center">
-      <span>Count: {count()}</span>
-      <span>Double: {double()}</span>
-      <button type="button" onClick={increment}>
-        Increment
-      </button>
-      <div style="color: red;">This is a red div</div>
-      <div style={{ color: "red" }}>This is a red div</div>
-      <div class={theme() === "light" ? "light-theme" : "dark-theme"}>
-        This div's theme is determined dynamically!
-      </div>
-      <ThemedButton theme={theme()} />
-      <Show when={theme() === "light"} fallback={<div>Loading...</div>}>
-        <h1>Hi, I am {theme()}.</h1>
-      </Show>
-      <Show when={theme() === "light"}>
-        <div>Loading...</div>
-        <Show when={theme() === "dark"}>
-          <div>Dark</div>
+    <Provider>
+      {/* <div class="flex flex-col items-center justify-center">
+        <span>Count: {count()}</span>
+        <span>Double: {double()}</span>
+        <span>Message: {message()}</span>
+        <button type="button" onClick={increment}>
+          Increment
+        </button>
+        <div style="color: red;">This is a red div</div>
+        <div style={{ color: "red" }}>This is a red div</div>
+        <div class={theme() === "light" ? "light-theme" : "dark-theme"}>
+          This div's theme is determined dynamically!
+        </div>
+        <ThemedButton theme={theme()} />
+        <Show when={theme() === "light"} fallback={<div>Loading...</div>}>
+          <h1>Hi, I am {theme()}.</h1>
         </Show>
-      </Show>
-      <Switch>
-        <Match when={theme() === "light"}>
-          <p>Light</p>
-        </Match>
-        <Match when={theme() === "dark"}>
-          <p>Dark</p>
-        </Match>
-      </Switch>
-      <App />
-    </div>
+        <Show when={theme() === "light"}>
+          <div>Loading...</div>
+          <Show when={theme() === "dark"}>
+            <div>Dark</div>
+          </Show>
+        </Show>
+        <Switch>
+          <Match when={theme() === "light"}>
+            <p>Light</p>
+          </Match>
+          <Match when={theme() === "dark"}>
+            <p>Dark</p>
+          </Match>
+        </Switch>
+        <App />
+      </div> */}
+      <Child />
+    </Provider>
   );
 }
 
@@ -85,14 +127,6 @@ const options = {
 function App() {
   const [selected, setSelected] = createSignal("red");
   const [count, setCount] = createSignal(0);
-
-  const timer = setInterval(() => {
-    setCount((prev) => prev + 1);
-  }, 1000);
-
-  onCleanup(() => {
-    clearInterval(timer);
-  });
 
   createEffect(() => {
     console.log("Outer effect starts");
@@ -141,4 +175,4 @@ function App() {
   );
 }
 
-export default App;
+export default Counter;
