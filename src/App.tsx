@@ -1,4 +1,4 @@
-import { A, useNavigate } from "@solidjs/router";
+import { A, action, redirect, useNavigate } from "@solidjs/router";
 import type { JSX } from "solid-js";
 
 const App = (props: { children?: JSX.Element }) => {
@@ -7,6 +7,11 @@ const App = (props: { children?: JSX.Element }) => {
   const handleClick = () => {
     navigate("/counter/1");
   };
+
+  const logout = action(async () => {
+    localStorage.remove("token");
+    throw redirect("/counter/12");
+  });
   return (
     <>
       <nav style={{ padding: "20px", background: "#f0f0f0" }}>
@@ -19,6 +24,9 @@ const App = (props: { children?: JSX.Element }) => {
       <main style={{ padding: "20px" }}>{props.children}</main>
       <button type="button" onClick={handleClick}>
         Navigate to Counter
+      </button>
+      <button type="submit" onClick={logout}>
+        Logout
       </button>
     </>
   );
