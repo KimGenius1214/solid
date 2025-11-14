@@ -15,12 +15,13 @@ import {
 } from "solid-js";
 import { createStore } from "solid-js/store";
 import { Portal } from "solid-js/web";
+import { useParams } from "@solidjs/router";
 
-function Counter() {
+function Counter(props?: { children?: JSX.Element }) {
   const [count, setCount] = createSignal(0);
   const [double, setDouble] = createSignal(0);
   const [message, setMessage] = createSignal("");
-
+  const params = useParams();
   const badMemo = createMemo(() => {
     if (count() > 10) {
       setMessage("Count is too high!"); //  side effect
@@ -68,6 +69,8 @@ function Counter() {
     return <span>{value as string}</span>;
   };
 
+  const myElement = <p>My Element</p>;
+
   const [store, setStore] = createStore({
     userCount: 3,
     users: [
@@ -105,7 +108,10 @@ function Counter() {
   console.log(store.users[3].username);
   return (
     <Provider>
-      {/* <div class="flex flex-col items-center justify-center">
+      <h1>Counter {params.id}</h1>
+      {props?.children}
+      {myElement}
+      <div class="flex flex-col items-center justify-center">
         <span>Count: {count()}</span>
         <span>Double: {double()}</span>
         <span>Message: {message()}</span>
@@ -136,7 +142,7 @@ function Counter() {
           </Match>
         </Switch>
         <App />
-      </div> */}
+      </div>
       <Child />
     </Provider>
   );
