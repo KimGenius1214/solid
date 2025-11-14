@@ -13,6 +13,7 @@ import {
   createContext,
   type JSX,
 } from "solid-js";
+import { createStore } from "solid-js/store";
 import { Portal } from "solid-js/web";
 
 function Counter() {
@@ -67,6 +68,41 @@ function Counter() {
     return <span>{value as string}</span>;
   };
 
+  const [store, setStore] = createStore({
+    userCount: 3,
+    users: [
+      {
+        id: 0,
+        username: "felix909",
+        location: "England",
+        loggedIn: false,
+      },
+      {
+        id: 1,
+        username: "tracy634",
+        location: "Canada",
+        loggedIn: true,
+      },
+      {
+        id: 2,
+        username: "johny123",
+        location: "India",
+        loggedIn: true,
+      },
+    ],
+  });
+
+  setStore("users", (currentUsers) => [
+    ...currentUsers,
+    {
+      id: 3,
+      username: "michael584",
+      location: "Nigeria",
+      loggedIn: false,
+    },
+  ]);
+
+  console.log(store.users[3].username);
   return (
     <Provider>
       {/* <div class="flex flex-col items-center justify-center">
